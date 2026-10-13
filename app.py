@@ -55,7 +55,7 @@ retriever = vectorDB.as_retriever(search_kwargs={"k": 2})
 
 
 
-st.title("LangChain + RAG + Hugging Face Q&A Chatbot")
+st.title("LangChain + RAG Chatbot")
 input_text = st.text_area(
     "Ask a question or paste your code and error:",
     height=200
