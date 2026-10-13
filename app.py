@@ -68,7 +68,7 @@ submit_button = st.button("Submit")
 def create_llm():
 
     llm = HuggingFaceEndpoint(
-    repo_id="google/gemma-2-2b-it",
+    repo_id="openai/gpt-oss-120b:groq",
     task="text-generation",
     max_new_tokens=2024,
     temperature=0.7,
