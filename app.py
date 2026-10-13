@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from langchain_core.prompts import ChatPromptTemplate,MessagesPlaceholder
-from langchain_huggingface import HuggingFaceEndpoint,ChatHuggingFace
+from langchain_groq import ChatGroq
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -67,19 +67,12 @@ submit_button = st.button("Submit")
 @st.cache_resource
 def create_llm():
 
-    llm = HuggingFaceEndpoint(
-    repo_id="openai/gpt-oss-120b:groq",
-    task="text-generation",
-    max_new_tokens=2024,
-    temperature=0.7,
-    top_p=0.8,
-    extra_body={
-        "chat_template_kwargs": {
-            "enable_thinking": False
-        }
-    }
-)
-    return ChatHuggingFace(llm=llm)
+    llm = ChatGroq(
+        model="openai/gpt-oss-20b",
+        temperature=0.7,
+        max_tokens=2048,
+    )
+    return llm
 
 
 
