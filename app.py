@@ -68,7 +68,7 @@ submit_button = st.button("Submit")
 def create_llm():
 
     llm = HuggingFaceEndpoint(
-    repo_id="Qwen/Qwen3-8B",
+    repo_id="mistralai/Mistral-7B-Instruct-v0.3",
     task="text-generation",
     max_new_tokens=2024,
     temperature=0.7,
