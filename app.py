@@ -7,7 +7,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
-from langchain_classic.chains import create_retrieval_chain
+from langchain_classic.chains import create_retrieval_chain,create_history_aware_retriever
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -17,7 +17,7 @@ import uuid
 load_dotenv()
 
 
-
+os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
 
 
 prompt_template = ChatPromptTemplate.from_messages([
@@ -37,6 +37,23 @@ prompt_template = ChatPromptTemplate.from_messages([
         "{input}"
     )
 ])
+## Standalone Question Generation Prompt.
+## This prompt instructs the model to reformulate the query asked by user using chat history if needed.
+
+contextualize_system_prompt=(
+            "Given a chat history and the latest user question"
+            "which might reference context in the chat history, "
+            "formulate a standalone question which can be understood "
+            "without the chat history. Do NOT answer the question, "
+            "just reformulate it if needed and otherwise return  as it is."
+        )
+
+context_prompt = ChatPromptTemplate.from_messages([
+      ("system",contextualize_system_prompt),
+      MessagesPlaceholder("messages"), ## for retrieval
+      ("human","{input}")
+      
+      ])
 
 @st.cache_resource
 def  create_vector_db():
@@ -78,9 +95,9 @@ def create_llm():
 
 chat_llm = create_llm()
 
+history_aware_retriever = create_history_aware_retriever(chat_llm,retriever,context_prompt)
 document_chain = create_stuff_documents_chain(chat_llm,prompt_template)
-
-retriever_chain = create_retrieval_chain(retriever,document_chain)
+retriever_chain = create_retrieval_chain(history_aware_retriever,document_chain)
 
 if "session_id" not in st.session_state:
     st.session_state["session_id"] = str(uuid.uuid4())
